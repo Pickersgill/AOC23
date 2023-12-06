@@ -46,8 +46,15 @@ MAP_ORDER = list(maps.keys())[1:]
 
 min_seed = None
 min_loc = None
-for s, r in zip(maps["seeds"][::2], maps["seeds"][1::2]):
+i = 0
+
+seeds = list(zip(maps["seeds"][::2], maps["seeds"][1::2]))
+seeds.sort(key=lambda x : x[0])
+print(seeds)
+for s, r in seeds:
+    print("Searching range, ", i:=i+1)
     for seed in range(s, s+r):
+        print((seed - s) / r)
         key = seed
         for m in MAP_ORDER:
             key = use_map(maps[m], key)
