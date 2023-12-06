@@ -41,24 +41,23 @@ def use_map(m, key):
             return d + key - s
     return key
 
-MAP_ORDER = list(maps.keys())[1:]
+MAP_ORDER = list(maps.keys())[1:][::-1]
+for M in MAP_ORDER:
+    old = maps[M]
+    new = [(s, d, r) for d, s, r in old]
+    maps[M] = new
 
-print(maps["seeds"])
-
-min_seed = None
-min_loc = None
-for seed in maps["seeds"]:
-    key = seed
+loc_list = [x[1] for x in maps[MAP_ORDER[0]]]
+loc_list.sort()
+for loc in loc_list:
+    key = loc
     for m in MAP_ORDER:
         key = use_map(maps[m], key)
     
-    if not min_loc or key < min_loc:
-        min_loc = key
-        min_seed = seed
-
-print("Minimum Seed: ", min_seed)
-print("Minimum Location: ", min_loc)
-
-    
+    for s, d in zip(maps["seeds"][::2], maps["seeds"][1::2]):
+        if key in range(s, s+d):
+            print(loc)
+            print(key)
+            exit()
 
         
