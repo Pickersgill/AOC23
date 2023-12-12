@@ -4,15 +4,15 @@ src = "./day6_input.txt"
 
 with open(src) as data:
     times, data = [l.split() for l in data.readlines()]
-    records = [(int(a), int(b)) for a, b in zip(times[1:], data[1:])]
+    time = int("".join(times[1:]))
+    record = int("".join(data[1:]))
+    records = [(time, record)]
 
 print(records)
 
 def get_time(hold, limit):
     dist = 0
-    for i in range(hold, limit):
-        dist += hold
-    return dist
+    return hold * (limit-hold)
 
 
 total = 1
