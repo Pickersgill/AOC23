@@ -14,59 +14,42 @@ test = [
 ]
 
 with open(src) as data:
-    lines = list([[s for s in tuple(l.strip().split(" "))] for l in data.readlines()])
-    #lines = list([[s for s in tuple(l.strip().split(" "))] for l in test])
+    #lines = list([[s for s in tuple(l.strip().split(" "))] for l in data.readlines()])
+    lines = list([[s for s in tuple(l.strip().split(" "))] for l in test])
     lines = list([(l, list([int(x) for x in g.split(",")])) for l, g in lines])
+    og_lines = lines[:]
     
-    #for i, l in enumerate(lines):
-        #for j in range(4):
-            #lines[i] = [lines[i][0] +"?"+ lines[i][0], lines[i][1] + lines[i][1]]
+    for i, l in enumerate(lines):
+        l = lines[i][0]
+        g = lines[i][1]
+        for j in range(4):
+            lines[i] = [lines[i][0] + "?" + l, lines[i][1] + g]
+
 
 expr = r"#+"
 
 def validate(line, groups):    
-    i = 0
-    g = groups[:]
+    if "?" in line:
+        return False
 
-    while i < len(line) and line[i] != "?":
-        if line[i] == "#":
-            if len(g) == 0:
-                return True, True
-            count = g.pop(0)
-            check = 0
-            while i < len(line) and line[i] not in "?.":
-                i += 1
-                check += 1
-            if count > check:
-                return True, False
-            elif count < check:
-                return True, True
-        else:
-            i += 1
+    matches = re.findall(expr, line)
+    if len(matches) != len(groups):
+        return False
 
-    i -= 1
-    
-    #if not back:
-        #b_soft, b_hard = validate(line, groups, True)
-        #print(b_soft, b_hard)
+    for i in range(len(groups)):
+        if len(matches[i]) != groups[i]:
+            return False
 
-    if "?" not in line and len(g) == 0:
-        return False, False
-    elif len(line) - i < sum(g) + len(g) - 1:
-        return True, True
-    else:
-        return True, False
+    return True
 
-visits = 0
-
+v = 0
 def combos(line, groups):
-    global visits
-    visits += 1
-    soft, hard = validate(line, groups)
-    if not (soft or hard):
+    global v
+    v += 1
+    if validate(line, groups):
         return 1
     
-    if "?" not in line or hard:
+    if "?" not in line:
         return 0
 
     l1 = line.replace("?", ".", 1)
@@ -77,11 +60,14 @@ def combos(line, groups):
     return c1 + c2
 
 total = 0
+print(og_lines[0], combos(*og_lines[0]))
+print(lines[0], combos(*lines[0]))
+print(og_lines[3], combos(*og_lines[3]))
+print(lines[3], combos(*lines[3]))
 
-for l in lines:
-    c = combos(*l)
-    total += c
+exit()
 
 print(total)
-print("TOTAL CALLS: ", visits)
+print(v)
+
 
