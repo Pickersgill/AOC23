@@ -1,5 +1,5 @@
 import re
-from functools import lru_cache
+from functools import cache
 
 src = "./day12_input.txt"
 
@@ -15,84 +15,58 @@ test = [
 ]
 
 with open(src) as data:
-    #lines = list([[s for s in tuple(l.strip().split(" "))] for l in data.readlines()])
-    lines = list([[s for s in tuple(l.strip().split(" "))] for l in test])
-    lines = list([(l, list([int(x) for x in g.split(",")])) for l, g in lines])
+    lines = list([[s for s in tuple(l.strip().split(" "))] for l in data.readlines()])
+    #lines = list([[s for s in tuple(l.strip().split(" "))] for l in test])
+    lines = list([(l, tuple([int(x) for x in g.split(",")])) for l, g in lines])
     og_lines = lines[:]
     
     for i, l in enumerate(lines):
         l = lines[i][0]
         g = lines[i][1]
-        for j in range(1):
+        for j in range(4):
             lines[i] = [lines[i][0] + "?" + l, lines[i][1] + g]
 
-
-expr = r"#+"
-
-def validate(line, groups):    
-    if "?" in line:
-        return False
-
-    matches = re.findall(expr, line)
-    if len(matches) != len(groups):
-        return False
-
-    for i in range(len(groups)):
-        if len(matches[i]) != groups[i]:
-            return False
-
-    return True
-
-v = 0
-
-cache = {}
-
-def pop_groups(l, gs):
-    gs = gs[:]
-    ms = re.findall(r"#+", l)
-    count = 0
-    for m in ms:
-        if len(gs) > 0 and len(m) == gs.pop(0):
-            count += 1
+@cache
+def combos(line, groups):
+    if len(groups) == 0:
+        if "#" not in line:
+            return 1
         else:
-            break
-    return count
+            return 0 
 
-@lru_cache
-def combos(line, groups, li=0, gi=0):
-    if gi == len(groups) and len(filter(lambda x : x == "#", line[li:])) == 0:
-        return 1
-    if li == len(line) and gi != len(groups):
+    if len(line) == 0:
         return 0
     
-    while True:
-        if line[li] == ".":
-            break
-        li += 1
+    def dot():
+        return combos(line[1:], groups)
 
-    springs = 0
-    while True:
-        if springs == groups[gi]:
-            break
-        
-    
-    if line[li] == "#":
+    def spring():
+        block = line[:groups[0]]
+        block = block.replace("?", "#")
+        if "." in block or len(block) != groups[0]:
+            return 0
+
+        if len(line) == groups[0]:
+            if len(groups) == 1:
+                return 1
+            else:
+                return 0
+
+        if line[groups[0]] in ".?":
+            return combos(line[groups[0]+1:], groups[1:])
+
         return 0
 
-    
+    if line[0] == "#":
+        return spring()
+    elif line[0] == ".":
+        return dot()
+    else:
+        return spring() + dot()
     
 total = 0
-#print(og_lines[0], combos(*og_lines[0]))
-#print(lines[0])
-#print(combos(*lines[3]))
-for g in [lines[0]]:
-    cache = {}
-    print(g, len(g[0]))
-    print(combos(*g))
-exit()
-
-
+for g in lines:
+    total += combos(*g)
 print(total)
-print(v)
 
 
