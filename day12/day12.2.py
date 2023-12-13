@@ -1,4 +1,5 @@
 import re
+from functools import lru_cache
 
 src = "./day12_input.txt"
 
@@ -22,7 +23,7 @@ with open(src) as data:
     for i, l in enumerate(lines):
         l = lines[i][0]
         g = lines[i][1]
-        for j in range(2):
+        for j in range(1):
             lines[i] = [lines[i][0] + "?" + l, lines[i][1] + g]
 
 
@@ -57,41 +58,36 @@ def pop_groups(l, gs):
             break
     return count
 
+@lru_cache
 def combos(line, groups, li=0, gi=0):
-    init_li = li
-    init_gi = gi
-    if (li, gi) in cache.keys():
-        print("CACHE")
-        return cache[(li, gi)]
-
-    li = 0
+    if gi == len(groups) and len(filter(lambda x : x == "#", line[li:])) == 0:
+        return 1
+    if li == len(line) and gi != len(groups):
+        return 0
+    
     while True:
-        if li >= len(line):
-            val = 1 if validate(line, groups) else 0
-            cache[(li,gi)] = val
-            return val
-        if line[li] == "?":
+        if line[li] == ".":
             break
         li += 1
+
+    springs = 0
+    while True:
+        if springs == groups[gi]:
+            break
+        
     
-    l1 = line[:li] + "." + line[li+1:]
-    l2 = line[:li] + "#" + line[li+1:]
-    g1 = pop_groups(l1[:li+1], groups)
-    g2 = pop_groups(l2[:li+1], groups)
-    v1 = combos(l1, groups, li, g1)
-    v2 = combos(l2, groups, li, g2)
+    if line[li] == "#":
+        return 0
 
-    # CACHING NOT WORKING.    
-    cache[(init_li,init_gi)] = v1 + v2
-    return v1 + v2
-
+    
+    
 total = 0
 #print(og_lines[0], combos(*og_lines[0]))
 #print(lines[0])
 #print(combos(*lines[3]))
-for g in [lines[0], lines[3]]:
+for g in [lines[0]]:
     cache = {}
-    print(g)
+    print(g, len(g[0]))
     print(combos(*g))
 exit()
 
