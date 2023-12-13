@@ -1,26 +1,6 @@
 import numpy as np
 src = "./day13_input.txt"
-
-test = [
-"#.##..##.",
-"..#.##.#.",
-"##......#",
-"##......#",
-"..#.##.#.",
-"..##..##.",
-"#.#.##.#.",
-"\n",
-"#...##..#",
-"#....#..#",
-"..##..###",
-"#####.##.",
-"#####.##.",
-"..##..###",
-"#....#..#",
-]
-
 with open(src) as data:
-    #lines = [l.strip() for l in test]
     lines = [l.strip() for l in data.readlines()]
     grids = []
     cg = []
