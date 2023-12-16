@@ -9,6 +9,7 @@ word_to_num = {"one" : "1", "two" : "2", "three" : "3", "four" : "4", "five" : "
 expr = r"|".join([f"{x}" for x in word_to_num.keys()])
 expr = f"(?=({expr}))" # use lookahead match with capture group to match overlapping strings without consuming string
 
+
 total = 0
 for l in lines:
 
