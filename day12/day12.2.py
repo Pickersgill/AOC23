@@ -17,6 +17,7 @@ test = [
 with open(src) as data:
     lines = list([[s for s in tuple(l.strip().split(" "))] for l in data.readlines()])
     #lines = list([[s for s in tuple(l.strip().split(" "))] for l in test])
+    #lines = list([(l, tuple([int(x) for x in g.split(",")])) for l, g in lines])
     lines = list([(l, tuple([int(x) for x in g.split(",")])) for l, g in lines])
     og_lines = lines[:]
     
