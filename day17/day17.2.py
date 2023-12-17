@@ -24,19 +24,19 @@ with open(src) as data:
     #weights = [[int(x) for x in l.strip()] for l in test]
     H, W = len(weights), len(weights[0])
 
+
 """
 Day 17, Djikstras
 
 - Initialize heap as left pointing and right pointing 0,0
 - Expand by finding all points to min-max left and right
-- 
 
 """
 heap = [(0, ((0, 0), (0, 1))), (0, ((0, 0), (1, 0)))]
 dists = defaultdict(lambda : inf)
 dest = (W-1,H-1)
 
-lo, hi = 1, 3
+lo, hi = 4, 10
 
 while heap:
     cost, (pos, d) = heappop(heap)
@@ -48,15 +48,16 @@ while heap:
     x, y = pos
     for cdx, cdy in [(-dy, dx),(dy, -dx)]:
         dcost = cost
-        for i in range(lo, hi+1):
+        for i in range(1, hi+1):
             newx = x + i * cdx
             newy = y + i * cdy
             if 0 <= newx < W and 0 <= newy < H:
                 dcost += weights[newy][newx]
-                state = ((newx, newy),(cdx,cdy))
-                if dcost < dists[state]:
-                    dists[state] = dcost
-                    heappush(heap, (dcost, state))
+                if i >= lo:
+                    state = ((newx, newy),(cdx,cdy))
+                    if dcost < dists[state]:
+                        dists[state] = dcost
+                        heappush(heap, (dcost, state))
 
         
 
