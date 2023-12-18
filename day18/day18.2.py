@@ -41,7 +41,7 @@ def explore(ms):
 
 def shoelace(ps):
     """
-    1/2 * sum(1,n) |[[xi, yi][x+1,y+1]]|
+    1/2 * sum(1,n) |[[xi, yi][xi+1,yi+1]]|
     where n+1 => 1
     """
     n = len(ps)
@@ -55,7 +55,6 @@ def shoelace(ps):
     return area + per + 1
 
 path = explore(moves)
-print(path)
 print(shoelace(path))
 
 
