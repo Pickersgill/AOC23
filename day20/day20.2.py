@@ -33,6 +33,9 @@ class Gate:
         self.ins = {}
         self.mem = 0
 
+    def as_dot(self):
+        return "\n".join([f"{self.name} -> {o}" for o in self.outs])
+    
     def add_in(self, g):
         self.ins[g] = 0
 
@@ -78,27 +81,34 @@ with open(src) as data:
 
 lows = 0
 highs = 0
-for i in range(1000):
-    events = [("button", 0, "broadcaster")]
-    lows += 1
-    while events:
-        print("\n".join([str(e) for e in events]))
-        n_events = []
-        for sender, hi, n in events:
-            if n in gates.keys():
-                l, h, evs = gates[n].pulse(sender, hi)
-                n_events += evs
-                lows += l
-                highs += h
-        events = n_events
-
-print(lows, highs)
-print(lows * highs)
-
+i = 0
 """
-Create new pulse event
-Resolve each pulse event, creating all new events,
-Repeat
-"""
+RX has one input, GF
 
-print("DONT FORGET ABOUT WONKY RX")
+GF is a conjunction with 4 inputs
+GF will give a low pulse only when all 4 of these inputs are HI
+Find the cycle size for each input
+Find the LCM of these
+"""
+loops = {}
+start_gates = gate_list[:]
+test_gates = list(gates["gf"].ins.keys())
+for g in test_gates:
+    c = 0
+    events = []
+    end = False
+    print(g)
+    while not end:
+        c += 1
+        events = [("button", 0, "broadcaster")]
+        while len(events) > 0:
+            n_events = []
+            for sender, hi, n in events:
+                if n in gates.keys():
+                    l, h, evs = gates[n].pulse(sender, hi)
+                    n_events += evs
+            events = n_events
+            if (g, 1, "gf") in events:
+                end = True
+    print(c)
+    gate_list = start_gates
