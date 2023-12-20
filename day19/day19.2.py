@@ -21,6 +21,12 @@ test = [
 "{x=2127,m=1623,a=2188,s=1013}",
 ]
 
+t2 = [
+"in{a>2000:one,A}",
+"one{m<1000:R,A}",
+""
+]
+
 class Rule:
     def __init__(self, text):
         self.t = text
@@ -55,32 +61,71 @@ with open(src) as data:
     expr = r"([a-z]+){(.*)}"
     lines = [l.strip() for l in data.readlines()]
     #lines = [l.strip() for l in test]
+    #lines = [l.strip() for l in t2]
     
     while lines[i]:
         i += 1
     t_lines = lines[:i]
-    i += 1
-    part_lines = lines[i:]
 
     tests = {m[1]: [Rule(x) for x in m[2].split(",")] for m in [re.match(expr, l) for l in t_lines]}
-    parts = [{p[0] : int(p[1]) for p in re.findall(r"([xmas])=(\d+)", l)} for l in part_lines]
-
 
 t = 0
-for part in parts:
-    curr = "in"
-    while curr not in "AR":
-        ts = tests[curr][:]
-        res = False
-        while not res:
-            res = ts.pop(0).eval(part)
-        curr = res
-    
-    if curr == "A":
-        t += sum(part.values())
+init_part = {"x": (1,4000), "m": (1,4000), "a": (1,4000), "s": (1,4000)}
 
+def get_combs(part):
+    x = (part["x"][1]-part["x"][0])+1
+    m = (part["m"][1]-part["m"][0])+1
+    a = (part["a"][1]-part["a"][0])+1
+    s = (part["s"][1]-part["s"][0])+1
+
+    return x*m*a*s
+
+def accepted(part, curr, i):
+    if curr == "R":
+        return 0
+    elif curr == "A":
+        return get_combs(part)
+
+    def split(c, a, v):
+        acc_set = part.copy()
+        dec_set = part.copy()
+        if c == ">":
+            dec_set[a] = (acc_set[a][0], v)
+            acc_set[a] = (v+1, acc_set[a][1])
+        else:
+            acc_set[a] = (acc_set[a][0], v-1)
+            dec_set[a] = (v, dec_set[a][1])
+
+        if acc_set[a][0] > acc_set[a][1]:
+            acc_set = False
+            print("HANDLE")
+
+        if dec_set[a][0] > dec_set[a][1]:
+            dec_set = False
+            print("HANDLE")
+
+        return acc_set, dec_set
+
+    test = tests[curr][i]
+
+    if test.default:
+        return accepted(part, test.next, 0)
+    else:
+        acc, dec = split(test.test_comp, test.test_attr, test.test_val)
+        ans1 = 0
+        ans2 = 0
+        if acc:
+            ans1 = accepted(acc, test.next, 0)
+            
+        if dec:
+            ans2 = accepted(dec, curr, i+1)
+
+        return ans1+ans2
+
+t = accepted(init_part, "in", 0)
+ans = 167409079868000
 print(t)
-
+print(ans, f"{int(ans!=t)*'IN'}CORRECT")
 
 
 
