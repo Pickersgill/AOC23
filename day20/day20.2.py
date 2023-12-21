@@ -1,4 +1,4 @@
-import re
+import re, math
 src = "day20_input.txt"
 
 t1 = [
@@ -78,10 +78,6 @@ with open(src) as data:
             if out in gates.keys():
                 gates[out].add_in(gate.name)
     
-
-lows = 0
-highs = 0
-i = 0
 """
 RX has one input, GF
 
@@ -94,11 +90,10 @@ loops = {}
 start_gates = gate_list[:]
 test_gates = list(gates["gf"].ins.keys())
 for g in test_gates:
-    c = 0
+    c = 0 
     events = []
-    end = False
-    print(g)
-    while not end:
+    marks = []
+    while len(marks) < 2:
         c += 1
         events = [("button", 0, "broadcaster")]
         while len(events) > 0:
@@ -109,6 +104,19 @@ for g in test_gates:
                     n_events += evs
             events = n_events
             if (g, 1, "gf") in events:
-                end = True
-    print(c)
+                marks.append(c)
+
+    loops[g] = marks
     gate_list = start_gates
+
+
+sizes = []
+for l in loops:
+    a1 = loops[l]
+    sizes.append(a1[1]-a1[0])
+
+print(sizes)
+print(math.prod(sizes))
+
+
+
